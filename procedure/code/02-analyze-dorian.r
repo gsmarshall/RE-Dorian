@@ -104,7 +104,7 @@ dorianWordPairs %>%
 
 #first, sign up for a Census API here: https://api.census.gov/data/key_signup.html
 #replace the key text 'yourkey' with your own key!
-counties <- get_estimates("county",product="population",output="wide",geometry=TRUE,keep_geo_vars=TRUE, key="96d81b8f2a75a110e7cba6be5260c280ea06ec1b")
+counties <- get_estimates("county",product="population",output="wide",geometry=TRUE,keep_geo_vars=TRUE, key="mykey")
 
 #select only the states you want, with FIPS state codes in quotes in the c() list
 #look up fips codes here: https://en.wikipedia.org/wiki/Federal_Information_Processing_Standard_state_code 
@@ -130,7 +130,7 @@ ggplot() +
 #Connectign to Postgres
 #Create a con database connection with the dbConnect function.
 #Change the user and password to your own!
-con <- dbConnect(RPostgres::Postgres(), dbname='dsm', host='artemis', user='sam', password='eleventyseven') 
+con <- dbConnect(RPostgres::Postgres(), dbname='dsm', host='artemis', user='sam', password='mypassword') 
 
 #list the database tables, to check if the database is working
 dbListTables(con) 
