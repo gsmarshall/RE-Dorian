@@ -30,23 +30,23 @@ library(here)
 
 #create temporal data frame & graph it
 
-dorian <- ts_data(dorian, by="hours")
-ts_plot(dorian, by="hours")
+dorianByHour <- ts_data(dorian_new, by="hours")
+ts_plot(dorian_new, by="hours")
 
 ############# NETWORK ANALYSIS ############# 
 
 #this is here as an example. change to the dorian3 data you processed in the previous script to try...
 
 #create network data frame. Other options for 'edges' in the network include mention, retweet, and reply
-dorianNetwork <- network_graph(dorian, c("quote"))
+dorianNetwork <- network_graph(dorian_new, c("quote"))
 
-plot.igraph(winterTweetNetwork)
+plot.igraph(dorianNetwork)
 #Please, this is incredibly ugly... if you finish early return to this function and see if we can modify its parameters to improve aesthetics
 
 ############# TEXT / CONTEXTUAL ANALYSIS ############# 
 
 #remove urls, fancy formatting, etc. in other words, clean the text content
-dorianText = dorian %>% select(text) %>% plain_tweets()
+dorianText = dorian_new %>% select(text) %>% plain_tweets()
 
 #parse out words from tweet text
 dorianWords = dorianText %>% unnest_tokens(word, text)
@@ -66,6 +66,7 @@ count(dorianWords)
 
 # graph frequencies of words
 dorianWords %>%
+  filter(dorianWords$word != "hurricane") %>% # remove 'hurricane', since thats obvious and not super relevant to word frequency
   count(word, sort = TRUE) %>%
   top_n(15) %>%
   mutate(word = reorder(word, n)) %>%
@@ -79,10 +80,12 @@ dorianWords %>%
 
 dorianWordPairs = dorianText %>% 
   mutate(text = removeWords(text, stop_words$word)) %>%
-  unnest_tokens(paired_words, text, token = "ngrams", n = 2)
+  unnest_tokens(paired_words, text, token = "ngrams", n = 2) # ngrams indicates set of n words separated by space
+# these lines return a single column with all two-word pairs in the tweets
 
+# separates the word pairs into their component words - note that we can't use unnest_tokens bc that would put them all in one column and eliminate the assoociation between the words
 dorianWordPairs = separate(dorianWordPairs, paired_words, c("word1", "word2"),sep=" ")
-dorianWordPairs = dorianWordPairs %>% count(word1, word2, sort=TRUE)
+dorianWordPairs = dorianWordPairs %>% count(word1, word2, sort=TRUE) # counts all the times the word pairs appear together
 
 # graph a word cloud with space indicating association.
 # you may change the filter to filter more or less than pairs with 30 instances
@@ -90,7 +93,7 @@ dorianWordPairs %>%
   filter(n >= 30) %>%
   graph_from_data_frame() %>%
   ggraph(layout = "fr") +
-  # geom_edge_link(aes(edge_alpha = n, edge_width = n)) +
+  geom_edge_link(aes(edge_alpha = n, edge_width = n)) +
   geom_node_point(color = "darkslategray4", size = 3) +
   geom_node_text(aes(label = name), vjust = 1.8, size = 3) +
   labs(title = "Word Network of Tweets during Hurricane Dorian",
@@ -101,14 +104,14 @@ dorianWordPairs %>%
 
 #first, sign up for a Census API here: https://api.census.gov/data/key_signup.html
 #replace the key text 'yourkey' with your own key!
-counties <- get_estimates("county",product="population",output="wide",geometry=TRUE,keep_geo_vars=TRUE, key="1fb2d48d1ae3f73a19d620f258ec9f823ad09b25")
+counties <- get_estimates("county",product="population",output="wide",geometry=TRUE,keep_geo_vars=TRUE, key="96d81b8f2a75a110e7cba6be5260c280ea06ec1b")
 
 #select only the states you want, with FIPS state codes in quotes in the c() list
 #look up fips codes here: https://en.wikipedia.org/wiki/Federal_Information_Processing_Standard_state_code 
 counties = filter(counties,STATEFP %in% c('54', '51', '50', '47', '45', '44', '42', '39', '37','36', '34', '33', '29', '28', '25', '24', '23', '22', '21', '18', '17','13', '12', '11', '10', '09', '05', '01') )
 
 #map results with GGPlot
-#note: cut_interval is an equal interval classification function, while cut_numer is a quantile / equal count function
+#note: cut_interval is an equal interval classification function, while cut_number is a quantile / equal count function
 #you can change the colors, titles, and transparency of points
 ggplot() +
   geom_sf(data=counties, aes(fill=cut_number(DENSITY,5)), color="grey")+
@@ -127,7 +130,7 @@ ggplot() +
 #Connectign to Postgres
 #Create a con database connection with the dbConnect function.
 #Change the user and password to your own!
-con <- dbConnect(RPostgres::Postgres(), dbname='dsm', host='artemis', user='user', password='password') 
+con <- dbConnect(RPostgres::Postgres(), dbname='dsm', host='artemis', user='sam', password='eleventyseven') 
 
 #list the database tables, to check if the database is working
 dbListTables(con) 
@@ -139,14 +142,29 @@ doriansql <- select(dorian,c("user_id","status_id","text","lat","lng"),starts_wi
 dbWriteTable(con,'dorian',doriansql, overwrite=TRUE)
 
 # try also writing the november tweet data to the database! Add code below:
+dbWriteTable(con,'november_new',november_new, overwrite=TRUE)
+
 
 # SQL to add geometry column of type point and crs NAD 1983: 
 # SELECT AddGeometryColumn ('schemaname','dorian','geom',4269,'POINT',2, false);
 # SQL to calculate geometry:
 # UPDATE dorian set geom = st_transform(st_makepoint(lng,lat),4326,4269);
 
-#make all lower-case names for counties, because PostGreSQL is not into capitalization
+# trying to run the above queries right in r with dbi
+dbSendQuery(con, "SELECT AddGeometryColumn ('sam','dorian','geom',4269,'POINT',2, false)")
+# check the results
+dorian_geom <- dbSendQuery(con, "SELECT geom FROM dorian")
+dbFetch(dorian_geom)
 
+dbSendStatement(con, "UPDATE dorian set geom = st_transform(st_setsrid(st_makepoint(lng,lat),4326),4269)")
+
+# make geometries for november
+dbSendQuery(con, "SELECT AddGeometryColumn ('sam','november_new','geom',4269,'POINT',2, false)")
+
+dbSendStatement(con, "UPDATE november_new set geom = st_transform(st_setsrid(st_makepoint(lng,lat),4326),4269)")
+
+
+#make all lower-case names for counties, because PostGreSQL is not into capitalization
 dbWriteTable(con,'counties',lownames(counties), overwrite=TRUE)
 
 #disconnect from the database
