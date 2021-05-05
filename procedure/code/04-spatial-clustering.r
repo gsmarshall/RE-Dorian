@@ -74,6 +74,7 @@ thresdist = counties %>%
   st_centroid() %>%     # convert polygons to centroid points
   st_coordinates() %>%  # convert to simple x,y coordinates to play with stdep
   dnearneigh(0, 110, longlat = TRUE) %>%  # use geodesic distance of 110km
+	# distance should be long enough for every feature to have >= one neighbor
   include.self()       # include a county in its own neighborhood (for G*)
 
 # three optional steps to view results of nearest neighbors analysis
@@ -96,8 +97,10 @@ summary(counties$locG)
 # where 1.15 is at the 0.125 confidence level,
 # and 1.95 is at the 0.05 confidence level for two tailed z-scores
 # based on Getis and Ord (1995) Doi: 10.1111/j.1538-4632.1992.tb00261.x
-# alternatively, Bonferroni correction could be applied to adjust these
-# significance thresholds
+# to find other critical values, use the qnorm() function as shown here:
+# https://methodenlehre.github.io/SGSCLM-R-course/statistical-distributions.html
+# Getis Ord also suggest applying a Bonferroni correction 
+
 siglevel = c(1.15,1.95)
 counties = counties %>% 
   mutate(sig = cut(locG, c(min(counties$locG),
@@ -111,6 +114,8 @@ rm(siglevel)
 # Map hot spots and cold spots!
 # breaks and colors from http://michaelminn.net/tutorials/r-point-analysis/
 # based on 1.96 as the 95% confidence interval for z-scores
+# if your results don't have values in each of the 5 categories, you may need
+# to change the values & labels accordingly.
 ggplot() +
   geom_sf(data=counties, aes(fill=sig), color="white", lwd=0.1)+
   scale_fill_manual(
