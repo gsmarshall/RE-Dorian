@@ -85,6 +85,8 @@ dorian_raw = rehydratoR(twitter_token$app$key, twitter_token$app$secret,
                 twitter_token$credentials$oauth_secret, dorianids, 
                 base_path = NULL, group_start = 1)
 
+
+####################### load data from local file #####################
 # alternatively, geog 323 students may load original dorian tweets
 # download dorian_raw.RDS from 
 # https://github.com/GIS4DEV/geog323data/raw/main/dorian/dorian_raw.RDS

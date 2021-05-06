@@ -26,54 +26,61 @@ library(DBI)
 library(rccmisc)
 library(here)
 
+########## load data from local file ########
+tornado = readRDS(here("data","derived","private","tornado.RDS"))
+baseline = readRDS(here("data","derived","private","baseline.RDS"))
+
+
 ############# TEMPORAL ANALYSIS ############# 
 
 #create temporal data frame & graph it
-
-dorianTweetsByHour <- ts_data(dorian, by="hours")
-ts_plot(dorian, by="hours")
+# interesting! biggest spike is on april 29, well before the time indicated by NYT article (Monday, 5/3)
+tornadoTweetsByHour <- ts_data(tornado, by="hours")
+ts_plot(tornado, by="hours")
 
 
 ############# NETWORK ANALYSIS ############# 
 
 # Create network data frame. 
 # Other options for 'edges' in the network include mention, retweet, and reply
-dorianNetwork <- network_graph(dorian, c("quote"))
-
-plot.igraph(dorianNetwork)
+# modify this to graph retweets, like the california wildfire paper? 
+# can't, bc we excluded retweets - but might get something interesting from revising this graph of quotes
+tornadoNetwork <- network_graph(tornado, c("quote"))
+plot.igraph(tornadoNetwork)
 # This graph needs serious work... e.g. subset to a single state maybe?
 
 
 ############# TEXT / CONTEXTUAL ANALYSIS ############# 
 
 # remove urls, fancy formatting, etc. in other words, clean the text content
-dorianText = dorian %>% select(text) %>% plain_tweets()
+tornadoText = tornado %>% select(text) %>% plain_tweets()
 
 # parse out words from tweet text
-dorianWords = dorianText %>% unnest_tokens(word, text)
+tornadoWords = tornadoText %>% unnest_tokens(word, text)
 
 # how many words do you have including the stop words?
-count(dorianWords)
+count(tornadoWords)
 
 # create list of stop words (useless words not worth analyzing) 
 data("stop_words")
 
 # add "t.co" twitter links to the list of stop words
 # also add the twitter search terms to the list
+# change these added stop words to include my new search terms
 stop_words = stop_words %>% 
   add_row(word="t.co",lexicon = "SMART") %>% 
-  add_row(word="hurricane",lexicon = "Search") %>% 
-  add_row(word="dorian",lexicon = "Search") %>% 
-  add_row(word="sharpiegate",lexicon = "Search")
+  add_row(word="hail",lexicon = "Search") %>% 
+  add_row(word="tornado",lexicon = "Search") %>% 
+  add_row(word="storm",lexicon = "Search")
 
-#delete stop words from dorianWords with an anti_join
-dorianWords =  dorianWords %>% anti_join(stop_words) 
+#delete stop words from tornadoWords with an anti_join
+tornadoWords =  tornadoWords %>% anti_join(stop_words) 
 
 # how many words after removing the stop words?
-count(dorianWords)
+count(tornadoWords)
 
 # graph frequencies of words
-dorianWords %>%
+tornadoWords %>%
   count(word, sort = TRUE) %>%
   top_n(15) %>%
   mutate(word = reorder(word, n)) %>%
@@ -86,7 +93,9 @@ dorianWords %>%
        title = "Count of unique words found in tweets")
 
 # separate words and count frequency of word pair occurrence in tweets
-dorianWordPairs = dorianText %>% 
+# "cdt" and "pm" are top words both individually and together - might reflect many tweets automatically produced from 
+# government or weather service updates
+tornadoWordPairs = tornadoText %>% 
   mutate(text = removeWords(tolower(text), stop_words$word)) %>%
   unnest_tokens(paired_words, text, token = "ngrams", n = 2) %>%
   separate(paired_words, c("word1", "word2"),sep=" ") %>%
@@ -94,14 +103,17 @@ dorianWordPairs = dorianText %>%
 
 # graph a word cloud with space indicating association.
 # you may change the filter to filter more or less than pairs with 30 instances
-dorianWordPairs %>%
+# numbers indicating time are also frequent - should I filter these out?
+# this kinda makes the case for filtering out weather update tweets stronger, although it could be interesting to
+# do some analysis of hoe much influence these tweets have
+tornadoWordPairs %>%
   filter(n >= 25 & !is.na(word1) & !is.na(word2)) %>%
   graph_from_data_frame() %>%
   ggraph(layout = "fr") +
   geom_edge_link(aes(edge_alpha = n, edge_width = n)) +
   geom_node_point(color = "darkslategray4", size = 3) +
   geom_node_text(aes(label = name), vjust = 1.8, size = 3) +
-  labs(title = "Word Network of Tweets during Hurricane Dorian",
+  labs(title = "Word Network of Tweets during Tornado Warnings",
        x = "", y = "") +
   theme_void()
 
@@ -115,22 +127,19 @@ counties <- get_estimates("county",
                           product="population",
                           output="wide",
                           geometry=TRUE, keep_geo_vars=TRUE, 
-                          key="yourkey")
+                          key="96d81b8f2a75a110e7cba6be5260c280ea06ec1b")
 
 # select only the states you want, with FIPS state codes
 # look up fips codes here:
 # https://en.wikipedia.org/wiki/Federal_Information_Processing_Standard_state_code 
+# change state filters for my tornado analysis
 counties = filter(counties,
-                  STATEFP %in% c('54', '51', '50', '47', '45', '44', '42', '39',
-                                 '37','36', '34', '33', '29', '28', '25', '24',
-                                 '23', '22', '21', '18', '17','13', '12', '11',
-                                 '10', '09', '05', '01') )
+                  STATEFP %in% c('01', '05', '10', '11', '12', '13', '17', '18', '19', '20',
+                                 '21', '22', '24', '26', '27', '28', '29', '31', '34', '37',
+                                 '38', '39', '40', '42', '45', '46', '47', '48', '51', '54', '55'))
 
 # save counties to Derived/Public folder
 saveRDS(counties, here("data","derived","public","counties.RDS"))
-
-# optionally, load counties from derived/public/counties.RDS
-counties = readRDS(here("data","derived","public","counties.RDS"))
 
 # map results with GGPlot
 # note: cut_interval is an equal interval classification function, while 
@@ -140,9 +149,9 @@ ggplot() +
   geom_sf(data=counties, aes(fill=cut_number(DENSITY,5)), color="grey")+
   scale_fill_brewer(palette="GnBu")+
   guides(fill=guide_legend(title="Population Density"))+
-  geom_point(data = dorian, aes(x=lng,y=lat),
+  geom_point(data = tornado, aes(x=lng,y=lat),
              colour = 'purple', alpha = .2) +
-  labs(title = "Tweet Locations During Hurricane Dorian")+
+  labs(title = "Tweet Locations During Tornado Event")+
   theme(plot.title=element_text(hjust=0.5),
         axis.title.x=element_blank(),
         axis.title.y=element_blank())
