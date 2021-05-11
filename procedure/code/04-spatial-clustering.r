@@ -106,8 +106,8 @@ summary(counties$locG)
 siglevel = c(1.15,1.95)
 counties = counties %>% 
   mutate(sig = cut(locG, c(min(counties$locG),
-                           siglevel[2]*-1,
-                           siglevel[1]*-1,
+                           #siglevel[2]*-1,
+                           #siglevel[1]*-1,
                            siglevel[1],
                            siglevel[2],
                            max(counties$locG))))
@@ -121,8 +121,8 @@ rm(siglevel)
 ggplot() +
   geom_sf(data=counties, aes(fill=sig), color="white", lwd=0.1)+
   scale_fill_manual(
-    values = c("#0000FF80", "#8080FF80", "#FFFFFF80", "#FF808080", "#FF000080"),
-    labels = c("low","", "insignificant","","high"),
+    values = c("#FFFFFF80", "#FF808080", "#FF000080"),
+    labels = c("insignificant","","high"),
     aesthetics = "fill"
   ) +
   guides(fill=guide_legend(title="Hot Spots"))+
@@ -130,3 +130,7 @@ ggplot() +
   theme(plot.title=element_text(hjust=0.5),
         axis.title.x=element_blank(),
         axis.title.y=element_blank())
+
+
+# save counties table to map in QGIS
+write_sf(counties, here("data", "derived", "public", "counties_tornado.shp"))
