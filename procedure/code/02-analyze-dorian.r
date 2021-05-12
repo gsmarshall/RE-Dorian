@@ -25,6 +25,7 @@ library(RColorBrewer)
 library(DBI)
 library(rccmisc)
 library(here)
+library(stringr)
 
 ########## load data from local file ########
 tornado = readRDS(here("data","derived","private","tornado.RDS"))
@@ -36,7 +37,10 @@ baseline = readRDS(here("data","derived","private","baseline.RDS"))
 #create temporal data frame & graph it
 # interesting! biggest spike is on april 29, well before the time indicated by NYT article (Monday, 5/3)
 tornadoTweetsByHour <- ts_data(tornado, by="hours")
-ts_plot(tornado, by="hours")
+ts_plot(tornado, by="hours") + 
+  labs(x = "Date",
+       y = "Count",
+       title = "Tornado-Related Tweets Over Time")
 
 
 ############# NETWORK ANALYSIS ############# 
@@ -113,9 +117,26 @@ tornadoWordPairs %>%
   geom_edge_link(aes(edge_alpha = n, edge_width = n)) +
   geom_node_point(color = "darkslategray4", size = 3) +
   geom_node_text(aes(label = name), vjust = 1.8, size = 3) +
-  labs(title = "Word Network of Tweets during Tornado Warnings",
+  labs(title = "Word Network of Tweets during Tornado Events",
        x = "", y = "") +
   theme_void()
+
+
+# look into the most common words a bit
+sample <- tornado %>%
+  filter(str_detect(tornadoText$text, "CDT"))
+
+sample <- sample[order(sample$created_at, na.last = NULL), ]
+
+sample2 <- tornado[order(tornado$created_at, na.last = NULL), ]
+
+
+ts_plot(sample, by="hours") + 
+  labs(x = "Date",
+       y = "Count",
+       title = "Tornado-Related Tweets Over Time")
+# yep, looks like a large number of the tweets are from the National Weather Service and a family of accounts
+# called 'iembot' that parrots NWS alerts
 
 
 ############# SPATIAL ANALYSIS ############# 
@@ -148,7 +169,7 @@ saveRDS(counties, here("data","derived","public","counties.RDS"))
 ggplot() +
   geom_sf(data=counties, aes(fill=cut_number(DENSITY,5)), color="grey")+
   scale_fill_brewer(palette="GnBu")+
-  guides(fill=guide_legend(title="Population Density"))+
+  guides(fill=guide_legend(title="Population Density (individuals/mi^2)"))+
   geom_point(data = tornado, aes(x=lng,y=lat),
              colour = 'purple', alpha = .2) +
   labs(title = "Tweet Locations During Tornado Event")+

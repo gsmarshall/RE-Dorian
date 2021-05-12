@@ -54,10 +54,22 @@ counties = counties %>%
 
 counties = counties %>%
   mutate(dorrate = tornado / POP * 10000) %>%  # dorrate is tweets per 10,000
-  mutate(ntdi = (tornado - base) / (tornado + base)) %>%  # normalized tweet diff
-  mutate(ntdi = replace_na(ntdi,0))   # replace NULLs with 0's
+  mutate(ndti = (tornado - base) / (tornado + base)) %>%  # normalized tweet diff
+  mutate(ndti = replace_na(ntdi,0))   # replace NULLs with 0's
+
 
 rm(base_by_county)
+
+# map ndti
+ggplot() +
+  geom_sf(data=counties, aes(fill=cut_interval(ntdi,5)), color="grey")+
+  scale_fill_brewer(palette="RdBu", direction = -1)+
+  guides(fill=guide_legend(title="NDTI")) +
+  labs(title = "Normalized Difference Tweet Index")+
+  theme(plot.title=element_text(hjust=0.5),
+        axis.title.x=element_blank(),
+        axis.title.y=element_blank())
+
 
 # save counties geographic data with derived tweet rates
 saveRDS(counties,here("data","derived","public","counties_tweet_counts.RDS"))

@@ -30,10 +30,7 @@ Holler (2021) is studying Twitter data for Hurricane Dorian on the Atlantic coas
 Reproducing and replicating spatial research of Twitter activity during natural disasters continues to be relevant because the circumstances surrounding each natural disaster vary greatly and the role of social media in disaster reaction and response is rapidly evolving. In this replication study, I use Holler's methods to analyze Twitter activity related to a [tornado outbreak](https://www.nytimes.com/2021/05/03/us/tornadoes-mississippi-atlanta.html) that impacted the southeastern United States from May 2 - May 4 2021. While this event gained some national news coverage, it did not occupy national attention in the way that Hurricane Dorian did. In this study I seek to investigate whether or not this relative difference in prominence impacted the spatial distribution of Twitter activity related to the event, finding that geotagged Twitter activity related to the tornado events was dominated by automatic weather alert updates that may not reflect the actual spatial and temporal distribution of the storms or their impacts.
 
 
-
 ## Original Study Information
-
-**summarize Wang et al (2016) similar to the Holler (2021) summary below**
 
 Holler (2021) loosely replicated the methods of Wang et al (2016) for the case of Hurricane Dorian's landfall on the U.S. mainland during the 2019 Atlantic Hurricane season. Data used by Wang et al. (2016) was based on Twitter Search API queries for fire, wildfire, Bernardo, and San Marcos within a 40 mile radius of downtown San Diego from May 13 to May 22, 2014. After cleaning the tweet content, the authors identified the most frequent words and used k-means clustering to identify the most common groups of words, finding that the most common tweet content was related to reporting fire damage and extent and thanking first responders. To analyze networks of information flow, the authors built a network graph based on retweets, finding that local news and government accounts served as hubs of information from which many other users retweeted information. Wang et al. (2016) also used kernel density estimation to analyze the spatial distribution of tweets, finding that after accounting for population tweets were largely concentrated close to the actual location of the fires.
 
@@ -53,18 +50,37 @@ To analyze the spatial distribution of tweets, I joined both the tornado tweets 
 
 ## Replication Results
 
-- temporal analysis graph
-- content analysis graph
-- map of twitter activity
-- hot spot analysis
+The temporal distribution of tweets in this analysis supports the findings of Wang et al. (2016). News coverage of the tornadoes reported the most activity from May 2 - 4, while a graph of tornado-related tweets over time (fig. 1) shows a spike from May 3 - 4. This matches the original study's finding that activity spikes the day after a natural disaster. However, the largest spike in activity appears on April 29, well before the majority of tornado events. A cursory investigation of the tweets from this time and [news reports](https://spectrumlocalnews.com/tx/south-texas-el-paso/weather/2021/04/29/texas-storm-reports-from-april-28-29-severe-weather) suggests that this spike may be due to severe thunderstorms, hail, and tornado warnings around Fort Worth and San Antonio, Texas. This may indicate that the spatial  distribution of population has meaningful impacts on the temporal distribution of Twitter activity related to natural disasters, since the large populations impacted by storms and warnings in Texas on April 29 seem to have produced much more activity than the smaller, more rural populations impacted by more severe tornadoes on May 2 - 4.
+
+![Tweets over time](assets/tornado_tweets_by_day.png)
+_**Figure 1:** Tornado related tweets by day for the study period_
+
+The content analysis reveals that in the case of tornado activity, automatic weather alert bots contribute a significant amount of Twitter activity. The most common word pair was 'PM' and 'CDT' (fig. 2), which are almost exclusively found in date tags for National Weather Service updates. Selecting tweets containing the keyword "CDT" from the original pool of 4,651 tweets yielded 975 tweets, which suggests that around twenty percent of the total data set came from weather alert bots. Grouping this subset of the data by the source account supports this conclusion: of 975 tweets containing "CDT", only 7 came from personal accounts (i.e. "Twitter for iphone"); the remainder originated from NWS tornado warnings (350 tweets), iembot (a family of accounts that parrots NWS alerts, 493 tweets), and a family of accounts called "Svr Wx Impact Graphics" (125 tweets total).
+
+![Content graph](assets/tornado_word_network.png)
+_**Figure 2:** Network graph of word associations, revealing a large number of tweets coming from weather alert bots_
+
+This replication produced mixed but largely unclear results showing spatial clustering of Twitter activity related to tornado warnings. Comparing the map in figure 3 to news reports of the event indicates that the hotspot analysis may have accurately reported tornado activity in northern Mississippi, but it is unclear whether or not the other two major clusters in west Texas are related to specific storm events, and the cluster analysis did not show any other locations of significant activity despite news reports indicating multiple tornadoes across the south over this time period. In this respect, the normalized difference tweet index (fig. 4) may provide a more nuanced view of tornado-related Twitter activity, though this metric is untested for social media analysis. Ultimately, limited conclusions can be drawn from either the statistical hotspot test or the NDTI without comparing them to the actual reported locations of tornadoes and severe storms. This was a significant failure of the design of this replication in comparison with Wang et al. (2016) and Holler (2021), since unlike the original study and first replication this study lacks detailed and clearly defined information about the location and extent of the disaster event being studied.
+
+![Hotspot map](assets/tornado_clusters.png)
+_**Figure 3:** The data produced few significant hotspots and no significant areas of low activity_
+
+
+![NDTI map](assets/tornado_ndti.png)
+_**Figure 4:** The NDTI metric proposed by Holler (2021) shows the hotspots identified by the Getis-Ord statistic, as well as many potential areas of high and low activity that are not reflected in the hotspot map_
+
 
 ## Unplanned Deviations from the Protocol
 
-Summarize changes and uncertainties between
-- your expectation of a reproduction workflow based on the reading and Dorian analysis
-- your final workflow after completing the lab
+Due to the lack of areas of significantly lower Twitter activity, the classification intervals and visualization of the hotspot map had to be adjusted for this replication. The remainder of the analysis proceeded in accordance with Holler (2021) without any significant deviations.
+
 
 ## Discussion
+
+Contrary to Wang et al. (2016) and Holler (2021), this replication found that bots contributed significantly to Twitter activity related to tornado warnings, making up approximately 20% of the input data.
+
+- issue of weather bots
+- issue of scale with distributed, point-based phenomena like tornado outbreaks
 
 Provide a summary and interpretation of your key findings in relation to your research question. Mention if findings confirm or contradict patterns observed by Wang et al (2016) or by Holler (2021)
 
@@ -76,6 +92,11 @@ Do the research findings suggest a need for any future research?
 ## References
 
 Include any referenced studies or materials in the [AAG Style of author-date referencing](https://www.tandf.co.uk//journals/authors/style/reference/tf_USChicagoB.pdf).
+
+### Acknowledgments
+
+Thanks to [Emma Clinton](https://emmaclinton.github.io/) for discovering and sharing the idea of studying Twitter activity related to tornado warnings. [Joseph Holler](https://github.com/josephholler) provided the methods and code necessary to conduct the analysis.
+
 
 ####  Report Template References & License
 
