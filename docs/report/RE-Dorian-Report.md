@@ -21,8 +21,6 @@ Revised: `11 May 2021`
 
 ## Abstract
 
-Why study the spatial distribution of Twitter data?
-
 Wang et al (2016) analyzed Twitter data for wildfires in California, finding that the social media data can provide useful insights into the spatial and temporal distribution of wildfires and fire-related hazards.
 
 Holler (2021) is studying Twitter data for Hurricane Dorian on the Atlantic coast, finding that in spite of trending news and social media content regarding a false narrative of risk, original Tweets still clustered significantly along the real hurricane track, and only along the hurricane track.
@@ -50,7 +48,7 @@ To analyze the spatial distribution of tweets, I joined both the tornado tweets 
 
 ## Replication Results
 
-The temporal distribution of tweets in this analysis supports the findings of Wang et al. (2016). News coverage of the tornadoes reported the most activity from May 2 - 4, while a graph of tornado-related tweets over time (fig. 1) shows a spike from May 3 - 4. This matches the original study's finding that activity spikes the day after a natural disaster. However, the largest spike in activity appears on April 29, well before the majority of tornado events. A cursory investigation of the tweets from this time and [news reports](https://spectrumlocalnews.com/tx/south-texas-el-paso/weather/2021/04/29/texas-storm-reports-from-april-28-29-severe-weather) suggests that this spike may be due to severe thunderstorms, hail, and tornado warnings around Fort Worth and San Antonio, Texas. This may indicate that the spatial  distribution of population has meaningful impacts on the temporal distribution of Twitter activity related to natural disasters, since the large populations impacted by storms and warnings in Texas on April 29 seem to have produced much more activity than the smaller, more rural populations impacted by more severe tornadoes on May 2 - 4.
+The temporal distribution of tweets in this analysis supports the findings of Wang et al. (2016). News coverage of the tornadoes reported the most activity from May 2 - 4, while a graph of tornado-related tweets over time (fig. 1) shows a spike from May 3 - 4. This matches the original study's finding that activity spikes the day after a natural disaster. However, the largest spike in activity appears on April 29, well before the majority of tornado events were reported in the news. A cursory investigation of the tweets from this time and [news reports](https://spectrumlocalnews.com/tx/south-texas-el-paso/weather/2021/04/29/texas-storm-reports-from-april-28-29-severe-weather) suggests that this spike may be due to severe thunderstorms, hail, and tornado warnings around Fort Worth and San Antonio, Texas.
 
 ![Tweets over time](assets/tornado_tweets_by_day.png)
 _**Figure 1:** Tornado related tweets by day for the study period_
@@ -77,12 +75,11 @@ Due to the lack of areas of significantly lower Twitter activity, the classifica
 
 ## Discussion
 
-Contrary to Wang et al. (2016) and Holler (2021), this replication found that bots contributed significantly to Twitter activity related to tornado warnings, making up approximately 20% of the input data.
+Although errors in study design prevented a complete replication of Wang et al. (2016) or Holler (2021), some of the quirks I encountered in the results could be useful for future studies. The spike in Twitter activity on April 29, which may have been due to storm activity near Fort Worth and San Antonio, Texas, may indicate that the spatial distribution of population has meaningful impacts on the temporal distribution of Twitter activity related to natural disasters. The large populations impacted by storms and warnings in Texas on April 29 seem to have produced much more activity than the smaller, more rural populations impacted by more severe tornadoes on May 2 - 4. If this speculation is correct it could suggest a need for combined spatial and temporal analysis of disaster events like hurricanes, which have well defined spatial and temporal tracks and which often impact both urban and rural areas in different ways.
 
-- issue of weather bots
-- issue of scale with distributed, point-based phenomena like tornado outbreaks
+The issues with verifying the accuracy of hotspot analysis in this replication highlighted the need for careful consideration of the scale and topology of disaster events when designing studies involving social media data. While wildfires are an area-based phenomenon that impact neighboring areas as they spread and hurricanes behave similarly over a very large storm track, tornadoes are more point-based and their locations are less predictable - a severe storm or tornado warning may impact a well-defined area, but the tornadoes themselves may touch down in more or less random locations that aren't necessarily close to one another. This makes social media analysis more difficult, since identifying and comparing areas that experience different impacts requires more sensitive and fine-scale analysis techniques.
 
-Provide a summary and interpretation of your key findings in relation to your research question. Mention if findings confirm or contradict patterns observed by Wang et al (2016) or by Holler (2021)
+Contrary to Wang et al. (2016) and Holler (2021), I found that bots contributed significantly to Twitter activity related to tornado warnings, making up approximately 20% of the input data. Further work is needed to explicitly analyze the role of bots in disaster-related Twitter activity, including how they impact the information networks highlighted by Wang et al. (2016) and how bot activity may vary across space and between different types of disasters.
 
 ## Conclusion
 
