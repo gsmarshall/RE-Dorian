@@ -14,7 +14,7 @@ First replication study by Holler, J. 2021 (in preparation). Hurricane Dorian vs
 Replication Author:
 Sam Marshall
 
-Replication Materials Available at: [github repository name](github repository link)
+Replication Materials Available at: [gsmarshall/RE-Dorian](https://github.com/gsmarshall/RE-Dorian)
 
 Created: `10 May 2021`
 Revised: `11 May 2021`
