@@ -87,9 +87,9 @@ This replication found that automatic weather alert bots can have significant im
 
 ## References
 
-Add citations for news articles here once you have internet
+Jimenez, Jesus. 2021. Severe Weather Threatens South as Tornadoes Tear Across 4 States. The New York Times, May 7. https://www.nytimes.com/2021/05/03/us/tornadoes-mississippi-atlanta.html
 
-Include any referenced studies or materials in the [AAG Style of author-date referencing](https://www.tandf.co.uk//journals/authors/style/reference/tf_USChicagoB.pdf).
+Spectrum News Weather Staff. 2021. Big hail & strong winds strike parts of Texas. Spectrum News, April 29. https://spectrumlocalnews.com/tx/south-texas-el-paso/weather/2021/04/29/texas-storm-reports-from-april-28-29-severe-weather
 
 ### Acknowledgments
 
